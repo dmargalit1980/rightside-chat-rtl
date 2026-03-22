@@ -1,0 +1,157 @@
+{
+  "name": "rightside-chat-rtl",
+  "displayName": "RightSide — Agent Chat RTL/LTR",
+  "description": "Workspace LTR/RTL preference, status bar toggle, and optional chat CSS (clipboard or explicit workbench sync — see warnings).",
+  "version": "0.6.0",
+  "publisher": "rightside",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dmargalit1980/rightside-chat-rtl.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:rightside.sidebar",
+    "onView:rightside.panel",
+    "onCommand:rightSide.toggleChatTextDirection",
+    "onCommand:rightSide.setChatTextDirectionLtr",
+    "onCommand:rightSide.setChatTextDirectionRtl",
+    "onCommand:rightSide.syncChatStylesToWorkbench",
+    "onCommand:rightSide.removeWorkbenchChatStyles",
+    "onCommand:rightSide.restoreWorkbenchFromRightSideBackup",
+    "onCommand:rightSide.copyChatRtlStylesheet",
+    "onCommand:rightSide.reapplyWorkbenchChatStyles",
+    "onCommand:rightSide.openRightSidePanel"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "rightside",
+          "title": "RightSide",
+          "icon": "media/activity-icon.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "rightsidePanel",
+          "title": "RightSide",
+          "icon": "media/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "rightside": [
+        {
+          "id": "rightside.sidebar",
+          "name": "Chat direction"
+        }
+      ],
+      "rightsidePanel": [
+        {
+          "id": "rightside.panel",
+          "name": "Chat direction"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "RightSide",
+      "properties": {
+        "rightSide.chatTextDirection": {
+          "type": "string",
+          "enum": [
+            "ltr",
+            "rtl"
+          ],
+          "default": "ltr",
+          "scope": "resource",
+          "description": "Preferred text direction for Agent chat (workspace). With autoSyncWorkbenchOnDirectionChange (default on), direction commands also sync CSS to workbench.html."
+        },
+        "rightSide.workbenchStyleInjection": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "description": "Deprecated. No longer used; automatic workbench edits are disabled to avoid Cursor integrity warnings. Use commands instead."
+        },
+        "rightSide.autoReloadAfterWorkbenchWrite": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "After a successful workbench.html write (sync/remove), reload the window automatically."
+        },
+        "rightSide.autoSyncWorkbenchOnDirectionChange": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "When true, every direction change (status bar, tree toggle, or Set LTR/RTL commands) also syncs workbench.html like “Apply styles” — without the extra confirm dialog. May trigger Cursor integrity warnings; turn off to only save the workspace setting."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "rightSide.openRightSidePanel",
+        "title": "RightSide: Open Chat Direction Panel"
+      },
+      {
+        "command": "rightSide.toggleChatTextDirection",
+        "title": "RightSide: Toggle Chat Text Direction (LTR ↔ RTL)"
+      },
+      {
+        "command": "rightSide.setChatTextDirectionLtr",
+        "title": "RightSide: Set Chat Text Direction — LTR"
+      },
+      {
+        "command": "rightSide.setChatTextDirectionRtl",
+        "title": "RightSide: Set Chat Text Direction — RTL"
+      },
+      {
+        "command": "rightSide.copyChatRtlStylesheet",
+        "title": "RightSide: Copy Chat Direction CSS to Clipboard (recommended)"
+      },
+      {
+        "command": "rightSide.syncChatStylesToWorkbench",
+        "title": "RightSide: Sync Chat Styles to workbench.html (risky — may trigger corrupt-install warning)"
+      },
+      {
+        "command": "rightSide.removeWorkbenchChatStyles",
+        "title": "RightSide: Remove Injected Styles from workbench.html"
+      },
+      {
+        "command": "rightSide.restoreWorkbenchFromRightSideBackup",
+        "title": "RightSide: Restore workbench.html from RightSide Backup (fix corrupt install)"
+      },
+      {
+        "command": "rightSide.reapplyWorkbenchChatStyles",
+        "title": "RightSide: Re-apply Workbench Chat Styles (alias of Sync — risky)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "vsix": "vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.2",
+    "typescript": "^5.4.0"
+  }
+}

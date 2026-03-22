@@ -1,0 +1,63 @@
+/*
+  RightSide — RTL for Cursor Agent / Composer.
+  Do not put "</style" in this file.
+  Shadow DOM: descendant selectors do NOT reach inside shadow roots; direction/text-align
+  INHERIT from the light-DOM host — we set strong rules on composer hosts + prose containers.
+*/
+
+/* ----- Light-DOM hosts (inherit into shadow content) ----- */
+.monaco-workbench .composer-messages-container,
+.monaco-workbench .composer-message-group,
+.monaco-workbench .composer-message,
+.monaco-workbench .composer-human-message-container,
+.monaco-workbench .composer-pane {
+  direction: rtl !important;
+}
+
+/* ----- Same targets + inner wrappers (light DOM + inherited) ----- */
+.monaco-workbench .composer-messages-container .markdown-section,
+.monaco-workbench .composer-message-group .markdown-section,
+.monaco-workbench .composer-message .markdown-section,
+.monaco-workbench .composer-human-message-container .markdown-section,
+.monaco-workbench .composer-messages-container .ProseMirror,
+.monaco-workbench .composer-message .ProseMirror,
+.monaco-workbench .composer-human-message-container .ui-prompt-input-editor .ProseMirror,
+.monaco-workbench .composer-messages-container [data-streamdown],
+.monaco-workbench .composer-message [data-streamdown] {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext;
+}
+
+/* ----- VS Code–style chat (if present) ----- */
+.interactive-item-container .value .rendered-markdown,
+.interactive-item-container .rendered-markdown,
+.interactive-item .markdown-body,
+.interactive-item .rendered-markdown .markdown-body {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext;
+}
+
+/* ----- Code / editors stay LTR ----- */
+.monaco-workbench .composer-code-block-content,
+.monaco-workbench .composer-code-block-content *,
+.monaco-workbench .markdown-block-code,
+.monaco-workbench .markdown-block-code *,
+.monaco-workbench .markdown-block-code-slash-edit,
+.monaco-workbench .markdown-block-code-slash-edit *,
+.monaco-workbench .composer-messages-container .markdown-section pre,
+.monaco-workbench .composer-messages-container .markdown-section .monaco-editor,
+.monaco-workbench .composer-message .markdown-section pre,
+.monaco-workbench .composer-message .markdown-section .monaco-editor,
+.monaco-workbench pre,
+.monaco-workbench .monaco-editor,
+.monaco-workbench .hljs,
+.interactive-item-container .rendered-markdown pre,
+.interactive-item-container .monaco-editor,
+.interactive-item .markdown-body pre,
+.interactive-item .monaco-editor {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: isolate !important;
+}

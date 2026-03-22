@@ -1,0 +1,60 @@
+# 1. In GitHub: Settings → Secrets → Actions → add OPEN_VSX_TOKEN (Open VSX PAT).
+#    Optional: VSCE_PAT for Microsoft Marketplace.
+# 2. Bump "version" in package.json, commit, then:
+#      git tag v0.6.1 && git push origin v0.6.1
+#    Or: Actions → this workflow → Run workflow.
+
+name: Package and publish extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run compile
+
+      - name: Create VSIX
+        run: npm run vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: '*.vsix'
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OPEN_VSX_TOKEN }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OPEN_VSX_TOKEN not set — skipping Open VSX (VSIX artifact is still uploaded)."
+            exit 0
+          fi
+          npx ovsx publish -p "$OVSX_PAT" -i "$(ls *.vsix | head -1)"
+
+      - name: Publish to Visual Studio Marketplace (optional)
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT not set — skipping Microsoft Marketplace."
+            exit 0
+          fi
+          npx vsce publish --packagePath "$(ls *.vsix | head -1)" -p "$VSCE_PAT" --no-dependencies
