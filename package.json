@@ -2,7 +2,7 @@
   "name": "rightside-chat-rtl",
   "displayName": "RightSide — Agent Chat RTL/LTR",
   "description": "Workspace LTR/RTL preference, status bar toggle, and optional chat CSS (clipboard or explicit workbench sync — see warnings).",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "publisher": "rightside",
   "repository": {
     "type": "git",
@@ -93,7 +93,13 @@
           "type": "boolean",
           "default": true,
           "scope": "application",
-          "description": "After a successful workbench.html write (sync/remove), reload the window automatically."
+          "description": "After a successful workbench.html write, offer or perform a window reload (see confirmBeforeReloadWindow)."
+        },
+        "rightSide.confirmBeforeReloadWindow": {
+          "type": "boolean",
+          "default": true,
+          "scope": "application",
+          "description": "When autoReloadAfterWorkbenchWrite is true, show a modal confirmation before Reload Window. Set false to reload immediately with no prompt."
         },
         "rightSide.autoSyncWorkbenchOnDirectionChange": {
           "type": "boolean",

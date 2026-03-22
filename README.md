@@ -24,6 +24,10 @@ This runs `@vscode/vsce` and produces `rightside-chat-rtl-<version>.vsix` (see `
 
 Install in Cursor: **Extensions → … → Install from VSIX…**
 
+### Showing up in Cursor’s Extensions search
+
+Cursor’s marketplace is mainly fed from **[Open VSX](https://open-vsx.org/)** (not only Microsoft’s Marketplace). After your version is **published and active** (not stuck in “Under review”), wait a bit for sync, then search in **Cursor → Extensions** by `displayName`, `name`, or keywords. If it still doesn’t appear, check Cursor’s [extension docs](https://cursor.com/docs) for the current registry and any allowlisting. Publishing the same extension to the **Visual Studio Marketplace** can help users on setups that query both.
+
 ---
 
 ## Publishing

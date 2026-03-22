@@ -9,6 +9,8 @@ export const CONFIG_KEYS = {
   autoReloadAfterWorkbenchWrite: 'autoReloadAfterWorkbenchWrite',
   /** After toggle / set LTR-RTL, write workbench.html (no confirm dialog). */
   autoSyncWorkbenchOnDirectionChange: 'autoSyncWorkbenchOnDirectionChange',
+  /** Ask before calling Reload Window after workbench writes (when auto-reload is on). */
+  confirmBeforeReloadWindow: 'confirmBeforeReloadWindow',
 } as const;
 
 export type TextDirection = 'ltr' | 'rtl';
@@ -51,4 +53,8 @@ export function getAutoSyncWorkbenchOnDirectionChange(): boolean {
   return (
     vscode.workspace.getConfiguration(CONFIG_SECTION).get<boolean>(CONFIG_KEYS.autoSyncWorkbenchOnDirectionChange) ?? true
   );
+}
+
+export function getConfirmBeforeReloadWindow(): boolean {
+  return vscode.workspace.getConfiguration(CONFIG_SECTION).get<boolean>(CONFIG_KEYS.confirmBeforeReloadWindow) ?? true;
 }

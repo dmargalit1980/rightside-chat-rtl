@@ -2,7 +2,11 @@ import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import { constants as fsConstants } from 'fs';
 import * as path from 'path';
-import { CONFIG_SECTION, getAutoReloadAfterWorkbenchWrite, getChatDirection } from './config';
+import {
+  getAutoReloadAfterWorkbenchWrite,
+  getChatDirection,
+  getConfirmBeforeReloadWindow,
+} from './config';
 
 const MARKER_BEGIN = '<!-- RIGHTSIDE_CHAT_STYLE_BEGIN -->';
 const MARKER_END = '<!-- RIGHTSIDE_CHAT_STYLE_END -->';
@@ -83,19 +87,38 @@ export async function readBundledRtlCss(extensionPath: string): Promise<string> 
   return fs.readFile(path.join(extensionPath, 'media', 'chat-rtl.css'), 'utf8');
 }
 
-async function maybeReloadWindow(autoReload?: boolean): Promise<void> {
-  const reload = autoReload ?? getAutoReloadAfterWorkbenchWrite();
-  if (reload) {
-    await vscode.commands.executeCommand('workbench.action.reloadWindow');
+async function offerReloadWindow(
+  reason: 'afterWrite' | 'afterRestore',
+  autoReloadOverride?: boolean
+): Promise<void> {
+  const autoReload = autoReloadOverride ?? getAutoReloadAfterWorkbenchWrite();
+  const confirmFirst = getConfirmBeforeReloadWindow();
+
+  const text =
+    reason === 'afterRestore'
+      ? 'RightSide: Reload the window now to finish restoring workbench.html?'
+      : 'RightSide: Reload the window now to apply workbench.html changes?';
+
+  if (!autoReload) {
+    const choice = await vscode.window.showInformationMessage(
+      `${text} You can also reload later from the Command Palette (Developer: Reload Window).`,
+      'Reload Window'
+    );
+    if (choice === 'Reload Window') {
+      await vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
     return;
   }
-  const choice = await vscode.window.showInformationMessage(
-    'RightSide: Reload the window for workbench changes to take effect.',
-    'Reload Window'
-  );
-  if (choice === 'Reload Window') {
-    await vscode.commands.executeCommand('workbench.action.reloadWindow');
+
+  if (confirmFirst) {
+    const choice = await vscode.window.showWarningMessage(text, { modal: true }, 'Reload Window', 'Later');
+    if (choice === 'Reload Window') {
+      await vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
+    return;
   }
+
+  await vscode.commands.executeCommand('workbench.action.reloadWindow');
 }
 
 export async function writeWorkbenchHtmlIfChanged(
@@ -122,7 +145,7 @@ export async function writeWorkbenchHtmlIfChanged(
   } catch (e) {
     return { ok: false, error: `Failed to write workbench.html: ${String(e)}` };
   }
-  await maybeReloadWindow(options?.autoReload);
+  await offerReloadWindow('afterWrite', options?.autoReload);
   return { ok: true };
 }
 
@@ -235,13 +258,7 @@ export async function restoreWorkbenchFromBackup(): Promise<void> {
   try {
     await assertWritable(workbenchPath);
     await fs.copyFile(bak, workbenchPath);
-    const choice = await vscode.window.showInformationMessage(
-      'RightSide: Restored workbench.html from backup. Reload the window (or restart Cursor).',
-      'Reload Window'
-    );
-    if (choice === 'Reload Window') {
-      await vscode.commands.executeCommand('workbench.action.reloadWindow');
-    }
+    await offerReloadWindow('afterRestore');
   } catch (e) {
     void vscode.window.showErrorMessage(`RightSide: Restore failed: ${String(e)}`);
   }
